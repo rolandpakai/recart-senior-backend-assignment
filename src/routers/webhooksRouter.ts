@@ -5,18 +5,23 @@ import { webhookHandlers } from '../handlers/webhookHandlers';
 const router = Router();
 
 router.post('/', async (req: Request, res: Response) => {
+  const shopifyTopic = req.headers['x-shopify-topic'] as string;
+
+  const handler = webhookHandlers[shopifyTopic];
+  if (!handler) {
+    res.status(400).json({ error: `Handler not found for topic: ${shopifyTopic}` });
+  }
+
   const validatedBody = WebhookSchema.safeParse(req.body);
 
   if (validatedBody.success) {
-    const { topic } = validatedBody.data;
-
-    const handler = webhookHandlers[topic];
-    if (!handler) {
-      res.status(400).json({ error: `Handler not found for topic: ${topic}` });
+    try {
+      await handler(shopifyTopic, validatedBody.data);
+      res.status(200).json({ status: 'ok' });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
+      res.status(400).json({ error: errorMessage });
     }
-
-
-    res.status(200).json({ status: 'ok' });
   } else {
     const errors = validatedBody.error.errors.map((err) => ({
       path: err.path.join('.'),
