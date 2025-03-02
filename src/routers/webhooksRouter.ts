@@ -1,11 +1,12 @@
 import { Router, Request, Response } from 'express';
 import { WebhookSchema } from '../schemas/WebhookSchema';
 import { webhookHandlers } from '../handlers/webhookHandlers';
+import { HEADER_SHOPIFY_TOPIC } from '../defaults';
 
 const router = Router();
 
 router.post('/', async (req: Request, res: Response) => {
-  const shopifyTopic = req.headers['x-shopify-topic'] as string;
+  const shopifyTopic = req.headers[HEADER_SHOPIFY_TOPIC] as string;
 
   const handler = webhookHandlers[shopifyTopic];
   if (!handler) {
