@@ -31,7 +31,7 @@ const sendRequestWithRetries = async ({ url, data, triesLeft = 3}: RequestWithRe
         throw new Error(`Failed to send request: ${response.json()}`);
       }
 
-      await waitFor(5000);
+      await waitFor(1000);
       await sendRequestWithRetries({ url, data, triesLeft: triesLeft - 1 });
     }
   } catch (error: unknown) {
@@ -39,7 +39,7 @@ const sendRequestWithRetries = async ({ url, data, triesLeft = 3}: RequestWithRe
     console.log(`Failed to send request, tries left: ${triesLeft}`, error);
     if (triesLeft === 0) throw error;
 
-    await waitFor(5000);
+    await waitFor(1000);
     await sendRequestWithRetries({ url, data, triesLeft: triesLeft - 1 });
   }
 }
