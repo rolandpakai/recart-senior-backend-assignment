@@ -3,10 +3,11 @@ import { WebhookSchema } from '../schemas/WebhookSchema';
 import { webhookHandlers } from '../handlers/webhookHandlers';
 import { HEADER_SHOPIFY_TOPIC } from '../defaults';
 import { verifyShopifyWebhook } from '../middlewares/verifyShopifyWebhook ';
+import { rateLimiter } from '../middlewares/rateLimit';
 
 const router = Router();
 
-router.post('/', verifyShopifyWebhook, async (req: Request, res: Response) => {
+router.post('/', rateLimiter, verifyShopifyWebhook, async (req: Request, res: Response) => {
   const shopifyTopic = req.headers[HEADER_SHOPIFY_TOPIC] as string;
 
   const handler = webhookHandlers[shopifyTopic];
