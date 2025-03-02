@@ -2,7 +2,7 @@
 import { Server } from 'http';
 import server from './server';
 import { connectToMongoDbWithRetries } from "./db";
-import { DEFAULT_PORT } from './defaults';
+import { PORT } from './defaults';
 
 export async function startServer(server: Server, PORT: number) {
   try {
@@ -20,5 +20,4 @@ export async function startServer(server: Server, PORT: number) {
   }
 }
 
-const PORT = parseInt(process.env.PORT || DEFAULT_PORT, 10);
 startServer(server, PORT);
