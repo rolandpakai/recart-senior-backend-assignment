@@ -1,14 +1,14 @@
 /* eslint-disable no-console */
 import waitFor from "./waitFor";
 import { requestLatency, requestErrors } from "../monitoring";
+import { WebhookQueueData } from "../types/WebhookQueueData";
+import { HEADER_SHOPIFY_TOPIC } from "../defaults";
 
-type RequestWithRetriesParams = {
-  url: string;
-  data: unknown;
+type RequestWithRetriesParams = WebhookQueueData & {
   triesLeft?: number;
 };
 
-const sendRequestWithRetries = async ({ url, data, triesLeft = 3}: RequestWithRetriesParams) => {
+const sendRequestWithRetries = async ({ topic, url, data, triesLeft = 3}: RequestWithRetriesParams) => {
   const startTime = process.hrtime();
 
   try {
@@ -16,6 +16,7 @@ const sendRequestWithRetries = async ({ url, data, triesLeft = 3}: RequestWithRe
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        [HEADER_SHOPIFY_TOPIC]: topic,
       },
       body: JSON.stringify(data),
     });
@@ -32,7 +33,7 @@ const sendRequestWithRetries = async ({ url, data, triesLeft = 3}: RequestWithRe
       }
 
       await waitFor(1000);
-      await sendRequestWithRetries({ url, data, triesLeft: triesLeft - 1 });
+      await sendRequestWithRetries({ topic, url, data, triesLeft: triesLeft - 1 });
     }
   } catch (error: unknown) {
     requestErrors.labels(url, 'network_error').inc();
@@ -40,7 +41,7 @@ const sendRequestWithRetries = async ({ url, data, triesLeft = 3}: RequestWithRe
     if (triesLeft === 0) throw error;
 
     await waitFor(1000);
-    await sendRequestWithRetries({ url, data, triesLeft: triesLeft - 1 });
+    await sendRequestWithRetries({ topic, url, data, triesLeft: triesLeft - 1 });
   }
 }
 
