@@ -1,6 +1,6 @@
 import { subscribersFindByTopic } from "../db/dao/subscriber-dao";
+import { webhookPublisher } from "../queues/webhookPublisher";
 import { Webhook } from "../types/Webhook";
-import { webhookPublisher } from "./webhookPublisher";
 
 export const ordersHandler = async (topic: string, webhookData: Webhook): Promise<void> => {
   const subscribers = await subscribersFindByTopic(topic);

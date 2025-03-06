@@ -1,4 +1,4 @@
-import { webhookQueue } from '../queues/webhookQueue';
+import { webhookQueue } from './webhookQueue';
 import { WebhookQueueData } from '../types/WebhookQueueData';
 
 export const webhookPublisher = async ({topic, url, data}: WebhookQueueData) => {
